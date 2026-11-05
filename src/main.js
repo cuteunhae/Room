@@ -1,4 +1,4 @@
-/* global Phaser, PLACES, COLLISION */
+/* global Phaser, PLACES, COLLISION, GameState */
 
 const PLAYER_SPEED = 120; // 초당 이동 거리. 이 값만 바꾸면 속도가 달라집니다.
 const CAMERA_ZOOM = 2.5; // 2.5배 확대. 값이 클수록 캐릭터와 지도가 크게 보입니다.
@@ -53,9 +53,28 @@ class MainScene extends Phaser.Scene {
     camera.setBounds(0, 0, 1000, 900);
     camera.setZoom(CAMERA_ZOOM);
     camera.startFollow(this.player);
+
+    this.dialogueOpen = false;
+    this.scene.launch('DialogueScene');
+
+    // 시작점 오른쪽의 임시 조사 상자. 클릭 거리는 아직 제한하지 않습니다.
+    const testBox = this.add.rectangle(540, 460, 16, 12, 0xa56a37)
+      .setStrokeStyle(1, 0x58391f)
+      .setInteractive({ useHandCursor: true });
+    testBox.on('pointerdown', () => {
+      if (this.dialogueOpen) return;
+      const message = GameState.get('testInvestigated') ? '이미 조사했다' : '처음 조사했다';
+      GameState.set('testInvestigated', true);
+      this.scene.get('DialogueScene').showDialogue(message);
+    });
   }
 
   update(_time, delta) {
+    if (this.dialogueOpen) {
+      this.player.anims.stop();
+      this.player.setFrame(PLAYER_ROWS[this.facing] * 4 + 1);
+      return;
+    }
     const dx = Number(this.cursors.right.isDown) - Number(this.cursors.left.isDown);
     const dy = Number(this.cursors.down.isDown) - Number(this.cursors.up.isDown);
     const length = Math.hypot(dx, dy);
@@ -130,6 +149,41 @@ class MainScene extends Phaser.Scene {
   }
 }
 
+// 별도 화면용 장면: 지도의 카메라 확대·이동에 영향을 받지 않습니다.
+class DialogueScene extends Phaser.Scene {
+  constructor() {
+    super('DialogueScene');
+  }
+
+  create() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+    // 투명한 전체 화면 입력막으로 대사 뒤의 상자가 클릭되지 않게 합니다.
+    const clickArea = this.add.rectangle(0, 0, width, height, 0x000000, 0)
+      .setOrigin(0, 0).setInteractive();
+    const panel = this.add.rectangle(24, height - 164, width - 48, 140, 0x151921, 0.95)
+      .setOrigin(0, 0).setStrokeStyle(2, 0xe9dfc8);
+    this.dialogueText = this.add.text(48, height - 136, '', {
+      fontFamily: 'sans-serif', fontSize: '28px', color: '#ffffff',
+      wordWrap: { width: width - 96 },
+    });
+    this.dialogue = this.add.container(0, 0, [clickArea, panel, this.dialogueText])
+      .setVisible(false);
+    clickArea.on('pointerdown', (_pointer, _x, _y, event) => {
+      event.stopPropagation();
+      this.dialogue.setVisible(false);
+      this.scene.get('MainScene').dialogueOpen = false;
+    });
+  }
+
+  showDialogue(message) {
+    this.dialogueText.setText(message);
+    this.scene.get('MainScene').dialogueOpen = true;
+    this.dialogue.setVisible(true);
+    this.scene.bringToTop();
+  }
+}
+
 const config = {
   type: Phaser.AUTO,
   parent: 'game',
@@ -140,7 +194,7 @@ const config = {
     width: 1000,
     height: 900,
   },
-  scene: [MainScene],
+  scene: [MainScene, DialogueScene],
 };
 
 new Phaser.Game(config);
