@@ -1,7 +1,8 @@
-/* global Phaser, PLACES, COLLISION, GameState, ITEMS */
+/* global Phaser, PLACES, COLLISION, GameState, ITEMS, InteriorScene */
 
 const PLAYER_SPEED = 120; // 초당 이동 거리. 이 값만 바꾸면 속도가 달라집니다.
 const CAMERA_ZOOM = 2.5; // 2.5배 확대. 값이 클수록 캐릭터와 지도가 크게 보입니다.
+const ENTRANCE_DISTANCE = 30; // 입구를 클릭해 들어갈 수 있는 거리(지도 픽셀).
 const PLAYER_ROWS = { down: 0, left: 1, right: 2, up: 3 };
 // 단축키를 바꿀 때는 이 객체만 수정합니다.
 const SHORTCUTS = Object.freeze({
@@ -66,6 +67,13 @@ class MainScene extends Phaser.Scene {
     this.inventoryOpen = false;
     this.scene.launch('DialogueScene');
 
+    PLACES.filter((place) => place.entrance).forEach((place) => {
+      const { x, y } = place.entrance;
+      this.add.rectangle(x, y, 8, 8, 0x267dff)
+        .setStrokeStyle(1, 0xffffff).setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => this.enterBuilding(place));
+    });
+
     // 시작점 오른쪽의 임시 조사 상자. 클릭 거리는 아직 제한하지 않습니다.
     const testBox = this.add.rectangle(540, 460, 16, 12, 0xa56a37)
       .setStrokeStyle(1, 0x58391f)
@@ -78,6 +86,17 @@ class MainScene extends Phaser.Scene {
       GameState.set('testInvestigated', true);
       this.scene.get('DialogueScene').showDialogue(message);
     });
+  }
+
+  enterBuilding(place) {
+    if (!place.entrance || this.dialogueOpen || this.inventoryOpen) return;
+    const { x, y } = place.entrance;
+    if (Math.hypot(this.player.x - x, this.player.y - y) > ENTRANCE_DISTANCE) return;
+    this.player.anims.stop();
+    this.input.keyboard.resetKeys();
+    // 야외는 잠들게 해 조사 상자와 지도 상태를 그대로 보존합니다.
+    this.scene.launch('InteriorScene', { placeId: place.id });
+    this.scene.sleep();
   }
 
   update(_time, delta) {
@@ -167,6 +186,7 @@ class DialogueScene extends Phaser.Scene {
   }
 
   create() {
+    this.worldSceneKey = 'MainScene';
     const width = this.scale.width;
     const height = this.scale.height;
     // 투명한 전체 화면 입력막으로 대사 뒤의 상자가 클릭되지 않게 합니다.
@@ -183,7 +203,7 @@ class DialogueScene extends Phaser.Scene {
     clickArea.on('pointerdown', (_pointer, _x, _y, event) => {
       event.stopPropagation();
       this.dialogue.setVisible(false);
-      this.scene.get('MainScene').dialogueOpen = false;
+      this.scene.get(this.worldSceneKey).dialogueOpen = false;
     });
     this.inventory = this.add.container(0, 0).setVisible(false);
     this.selectedItemId = null;
@@ -193,7 +213,7 @@ class DialogueScene extends Phaser.Scene {
   }
 
   toggleInventory() {
-    const main = this.scene.get('MainScene');
+    const main = this.scene.get(this.worldSceneKey);
     if (main.dialogueOpen) return;
     main.inventoryOpen = !main.inventoryOpen;
     if (main.inventoryOpen) {
@@ -250,7 +270,7 @@ class DialogueScene extends Phaser.Scene {
 
   showDialogue(message) {
     this.dialogueText.setText(message);
-    this.scene.get('MainScene').dialogueOpen = true;
+    this.scene.get(this.worldSceneKey).dialogueOpen = true;
     this.dialogue.setVisible(true);
     this.scene.bringToTop();
   }
@@ -266,7 +286,7 @@ const config = {
     width: 1000,
     height: 900,
   },
-  scene: [MainScene, DialogueScene],
+  scene: [MainScene, DialogueScene, InteriorScene],
 };
 
 new Phaser.Game(config);
