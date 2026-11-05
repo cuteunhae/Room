@@ -1,0 +1,17 @@
+# 생성 기록
+
+내장 ImageGen을 사용했습니다. API/CLI는 사용하지 않았습니다. 최종 시트는 규격 정리를 위해 1024×1024로 리샘플링했습니다. 실제 플레이용 도시 맵은 좌표 기반 SVG로 제작했습니다.
+
+## 최종 캐릭터 수정 프롬프트
+
+Edit this exact 4x4 transparent game sprite sheet. Keep identity, outfit, 4x4 layout, scale, row directions DOWN LEFT RIGHT UP, genuine transparency. Fix WALK CYCLE: currently columns 1 and 3 look identical. Change column 3 in EVERY row to the OPPOSITE leg and arm forward to column 1. Distinguish near leg and far leg overlap clearly in side views; down view column1 left shoe forward, column3 right shoe forward; up view opposite. Columns2 and4 are passing poses with opposite arm swing. Feet should remain at SAME BASELINE across every frame of a row; heads at same height. Maintain no text, no shadows, no background. Each cell equal size, character centered. Orthographic overhead RPG character.
+
+## 캐릭터 최초 생성 프롬프트
+
+Use case: stylized-concept. Production game asset: perfectly regular 4 columns by 4 rows sprite sheet on genuine transparent background. Entire canvas 1024x1024, each cell 256x256, no margins, no text or grid. Same adult protagonist returning to childhood hometown: short chestnut hair, cream cardigan over teal shirt, warm ochre trousers, brown shoes, small coral crossbody bag. Warm gentle storybook hand-painted 2D top-down RPG style with clean readable edges, orthographic 3/4 overhead view, no isometric perspective. Each character identical scale, centered horizontally in its cell, feet baseline at cell y=224, full body fits within central 140x200 pixels. Four rows directions in exact order: row1 facing DOWN (face visible), row2 LEFT (left profile), row3 RIGHT (right profile), row4 UP (back of head, no face). Four columns walk phases: left leg forward, neutral passing, right leg forward, neutral passing with opposite arm swing. Visible distinct alternating foot and arm positions, consistent head and clothing proportions, no duplicates or extra limbs. 16 separate full-body figures only; subtle painted shading, no ground shadow, no scenery, no checkerboard drawn into image.
+
+## 분위기 참고 일러스트 프롬프트
+
+Use case stylized-concept. Warm nostalgic hand-painted 2D top-down RPG island city map, complete city, no text, no people, no location markers. Aspect 10:9. Coordinate frame 1000x900 north up. Exact centers: photo studio 170,565; school 265,305; amusement park carousel 774,345; fenced playground 809,571; childhood home 533,778. Natural island coast, subtle pentagonal perimeter in blue sea. Wide continuous central oval ring road, northwest school to northeast amusement park route runs east then curves right southeast. Landmarks fountain west near studio, clock tower northwest school, pond northeast amusement park, big tree west exterior of playground. Playground swings northwest, slide northeast, seesaw east, sole gate southwest. Amusement park one western ticket booth entrance, souvenir stall outside carousel area. Studio door southwest. Home locked southern front door and separate narrow east side alley to north backyard gate, visible traversable access. Curved pedestrian paths connect every location to ring, normal small houses gardens and trees do not obstruct paths. Gentle creamy ochre roads, sage vegetation, coral roofs, turquoise sea, soft daylight, polished coherent comforting storybook game art. Orthographic overhead, low facade depth, no isometric camera, no captions or legend.
+
+이 일러스트는 생성 결과가 정확한 좌표·진입 경계를 보장하지 않아 `city-map.png`의 대체 배경으로 연결하지 않았습니다.

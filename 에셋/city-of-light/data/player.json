@@ -1,0 +1,29 @@
+{
+  "image": "assets/player-walk.png",
+  "width": 1024,
+  "height": 1024,
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "columns": 4,
+  "rows": {
+    "down": 0,
+    "left": 1,
+    "right": 2,
+    "up": 3
+  },
+  "fps": 7,
+  "sequence": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "idleColumn": 1,
+  "anchor": [
+    0.5,
+    0.97
+  ],
+  "displayHeight": 42,
+  "footRadius": 3,
+  "notes": "AI-painted 4-phase walk. Side-view opposing legs have subtle visual separation; review in animation before final release."
+}

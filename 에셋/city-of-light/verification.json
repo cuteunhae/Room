@@ -1,0 +1,16 @@
+{
+  "routeReachable": {
+    "C01": true,
+    "C02": true,
+    "C03": true,
+    "C04": true,
+    "C05": true,
+    "front": true
+  },
+  "reachableFootPositions": 87199,
+  "spriteSize": [
+    1024,
+    1024
+  ],
+  "spriteAlpha": true
+}
